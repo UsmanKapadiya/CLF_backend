@@ -1,0 +1,382 @@
+{
+	"info": {
+		"_postman_id": "clf-backend-api-collection",
+		"name": "CLF Backend API",
+		"description": "Complete API collection for CLF Backend with Admin and User endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"login"
+							]
+						},
+						"description": "Login as admin with username and password"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"logout"
+							]
+						},
+						"description": "Logout admin user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "About",
+			"item": [
+				{
+					"name": "Create About Content",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Choy Lee Fat\",\n  \"title\": \"陳享及蔡李佛拳簡介\",\n  \"category\": \"style\",\n  \"description\": \"<p>蔡李佛\\\"是南拳優秀拳種之一，源自\\\"少林\\\"。它套路繁多，內容豐富，手法重攻防配合， 步法靈活而穩健，發勁剛中帶柔，講究發聲與動作的配合。動作舒展大方，拳路氣勢磅礡。</p><p>蔡李佛\\\"是南拳優秀拳種之一，源自\\\"少林\\\"。它套路繁多，內容豐富，手法重攻防配合， 步法靈活而穩健，發勁剛中帶柔，講究發聲與動作的配合。動作舒展大方，拳路氣勢磅礡。</p><h2>Choy Lee Fat</h2><p>Choy Lee Fat is derived from Shaolin martial arts system</p>\",\n  \"parent_id\": \"\",\n  \"order\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/about",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about"
+							]
+						},
+						"description": "Create new about content with hierarchical structure"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All About Content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/about",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about"
+							]
+						},
+						"description": "Get all about content"
+					},
+					"response": []
+				},
+				{
+					"name": "Get About Content by Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/about?category=style",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "style"
+								}
+							]
+						},
+						"description": "Filter about content by category"
+					},
+					"response": []
+				},
+				{
+					"name": "Get About Content by Parent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/about?parent_id=null",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about"
+							],
+							"query": [
+								{
+									"key": "parent_id",
+									"value": "null",
+									"description": "Get root level items"
+								}
+							]
+						},
+						"description": "Get root level content (parent_id=null) or children of specific parent"
+					},
+					"response": []
+				},
+				{
+					"name": "Get About Content by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/about/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "your_content_id_here"
+								}
+							]
+						},
+						"description": "Get specific about content by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update About Content",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Name\",\n  \"title\": \"Updated Title\",\n  \"description\": \"<p>Updated description with HTML</p>\",\n  \"order\": 1,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/about/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "your_content_id_here"
+								}
+							]
+						},
+						"description": "Update existing about content"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete About Content",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/about/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"about",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "your_content_id_here"
+								}
+							]
+						},
+						"description": "Delete about content (prevents deletion if has children)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "News",
+			"item": [
+				{
+					"name": "Create News",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"title\": \"Sample News\",\n  \"description\": \"<p>Sample description</p>\",\n  \"date\": \"2025-12-17\",\n  \"slug\": \"sample-news\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/news",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"news"
+							]
+						},
+						"description": "Create a new news item"
+					},
+					"response": []
+				},
+				{
+					"name": "Update News",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated News\",\n  \"description\": \"<p>Updated description</p>\",\n  \"date\": \"2025-12-18\",\n  \"slug\": \"updated-news\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/news/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"news",
+								"1"
+							]
+						},
+						"description": "Update an existing news item"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All News",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/news",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"news"
+							]
+						},
+						"description": "Retrieve all news items"
+					},
+					"response": []
+				},
+				{
+					"name": "Get News by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/news/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"news",
+								"1"
+							]
+						},
+						"description": "Retrieve a specific news item by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete News",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/news/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"news",
+								"1"
+							]
+						},
+						"description": "Delete a specific news item by ID"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}
