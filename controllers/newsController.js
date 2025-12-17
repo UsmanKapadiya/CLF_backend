@@ -1,4 +1,5 @@
 const News = require('../models/News');
+const mongoose = require('mongoose'); // Import mongoose
 
 // Create News
 exports.createNews = async (req, res) => {
@@ -36,22 +37,34 @@ exports.createNews = async (req, res) => {
 // Update News
 exports.updateNews = async (req, res) => {
     try {
-        const { _id } = req.params;
+        const { id } = req.params; // Use id instead of _id
         const { title, description, date, slug, isActive } = req.body;
-        const news = await News.findById(_id);
-        if (!news) {
-            return res.status(404).json({ success: false, message: 'News not found' });
+
+        // Validate the ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid News ID'
+            });
         }
-        if (title !== undefined) news.title = title;
-        if (description !== undefined) news.description = description;
-        if (date !== undefined) news.date = date;
-        if (slug !== undefined) news.slug = slug;
-        if (isActive !== undefined) news.isActive = isActive;
-        await news.save();
-        return res.status(200).json({ 
+
+        const updatedNews = await News.findByIdAndUpdate(
+            id, // Use id here
+            { title, description, date, slug, isActive },
+            { new: true, runValidators: true } // Return the updated document and validate input
+        );
+
+        if (!updatedNews) {
+            return res.status(404).json({
+                success: false,
+                message: 'News not found'
+            });
+        }
+
+        return res.status(200).json({
             success: true,
-            message: 'News updated successfully', 
-            data: news 
+            message: 'News updated successfully',
+            data: updatedNews
         });
     } catch (error) {
         res.status(500).json({
