@@ -6,6 +6,87 @@
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+										{
+											"name": "Delete Gallery",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{base_url}}/api/gallery/:id",
+													"host": ["{{base_url}}"],
+													"path": ["api", "gallery", ":id"],
+													"variable": [
+														{"key": "id", "value": "2"}
+													]
+												},
+												"description": "Delete a gallery by its id."
+											},
+											"response": []
+										},
+				{
+					"name": "Gallery",
+					"item": [
+						{
+							"name": "Create Gallery",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{ "key": "id", "value": "2", "type": "text" },
+										{ "key": "title", "value": "2025 Lion Dance", "type": "text" },
+										{ "key": "year", "value": "2025", "type": "text" },
+										{ "key": "subTitle", "value": "Crystal Mall", "type": "text" },
+										{ "key": "catalogThumbnail", "type": "file", "src": "blob:http://localhost:3000/18b2b640-8e8c-40a8-9610-685894417ed2" },
+										{ "key": "photos", "value": "[{\"id\":9},{\"id\":10}]", "type": "text" },
+										{ "key": "9", "type": "file", "src": "blob:http://localhost:3000/18b2b640-8e8c-40a8-9610-685894417ed2" },
+										{ "key": "10", "type": "file", "src": "blob:http://localhost:3000/a8727d83-825e-4338-83cc-bfc29a3a87e4" }
+										
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/gallery",
+									"host": ["{{base_url}}"],
+									"path": ["api", "gallery"]
+								},
+								"description": "Create a new gallery. Send id, title, year, subTitle, catalogThumbnail (file), and photos (array of {id, src}). Attach photo files with keys matching their id."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Gallery by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/gallery/:id",
+									"host": ["{{base_url}}"],
+									"path": ["api", "gallery", ":id"],
+									"variable": [
+										{"key": "id", "value": "2"}
+									]
+								},
+								"description": "Get a gallery by its id. Returns standardized response with success, message, and data."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Galleries Grouped by Year",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/gallery/list-by-year",
+									"host": ["{{base_url}}"],
+									"path": ["api", "gallery", "list-by-year"]
+								},
+								"description": "Get all galleries grouped by year. Returns an object with years as keys and arrays of galleries as values."
+							},
+							"response": []
+						}
+					]
+				},
 		{
 			"name": "Admin",
 			"item": [

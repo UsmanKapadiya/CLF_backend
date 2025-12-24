@@ -101,3 +101,44 @@ exports.createGallery = async (req, res) => {
     });
   }
 };
+
+exports.getGalleryByYear = async (req, res) => {
+  try {
+    const galleries = await Gallery.find({});
+    // Group by year
+    const grouped = {};
+    galleries.forEach(gallery => {
+      const year = gallery.year || 'unknown';
+      if (!grouped[year]) grouped[year] = [];
+      grouped[year].push({
+        id: gallery.id,
+        title: gallery.title,
+        year: gallery.year,
+        subTitle: gallery.subTitle,
+        catalogThumbnail: gallery.catalogThumbnail,
+        photos: gallery.photos
+      });
+    });
+    res.status(200).json({
+      success: true,
+      message: 'Gallery list grouped by year',
+      data: grouped
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch galleries',
+      error: err.message,
+      data: null
+    });
+  }
+};
+
+exports.getGalleryById = async (id) => {
+  return await Gallery.findOne({ id: Number(id) });
+};
+
+exports.deleteGallery = async (id) => {
+  const result = await Gallery.findOneAndDelete({ id: Number(id) });
+  return result !== null;
+};
