@@ -1,22 +1,24 @@
 const Gallery = require('../models/Gallery');
+const cloudinary = require('cloudinary').v2;
 
-const fs = require('fs');
-const path = require('path');
+// Cloudinary config
+cloudinary.config({
+  cloud_name: 'db55ugwin',
+  api_key: '951285367961346',
+  api_secret: 'f3alAkUeK8HiUZvqQQ1HYu6zNZc',
+});
 
-
-// Save file buffer to uploads/ and return relative URL
-async function saveToUploads(buffer, filename) {
-  const uploadsDir = path.join(__dirname, '../uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-  // Ensure unique filename
-  const uniqueName = Date.now() + '-' + filename.replace(/\s+/g, '_');
-  const filePath = path.join(uploadsDir, uniqueName);
-  await fs.promises.writeFile(filePath, buffer);
-  const url = `/uploads/${uniqueName}`;
-  console.log(`Image uploaded successfully: ${url}`);
-  return url;
+async function uploadToCloudinary(buffer, filename) {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream({ resource_type: 'image', public_id: filename }, (error, result) => {
+      if (error) {
+        console.error('Cloudinary upload error:', error);
+        reject(error);
+      } else {
+        resolve(result.secure_url);
+      }
+    }).end(buffer);
+  });
 }
 
 exports.createGallery = async (req, res) => {
@@ -55,11 +57,10 @@ exports.createGallery = async (req, res) => {
       });
     }
 
-
-    // Handle catalogThumbnail upload (save locally)
+    // Handle catalogThumbnail upload
     if (filesMap['catalogThumbnail']) {
       const thumbFile = filesMap['catalogThumbnail'];
-      catalogThumbnail = await saveToUploads(thumbFile.buffer, thumbFile.originalname);
+      catalogThumbnail = await uploadToCloudinary(thumbFile.buffer, thumbFile.originalname);
     }
 
     // Handle photos upload (support both id-based and 'photos' array upload)
@@ -69,7 +70,7 @@ exports.createGallery = async (req, res) => {
       let src = '';
       if (filesMap[photoId.toString()]) {
         const file = filesMap[photoId.toString()];
-        src = await saveToUploads(file.buffer, file.originalname);
+        src = await uploadToCloudinary(file.buffer, file.originalname);
       }
       if (src) {
         photos.push({ id: photoId, src });
@@ -79,7 +80,7 @@ exports.createGallery = async (req, res) => {
     if (photosFiles.length > 0) {
       for (const file of photosFiles) {
         const photoId = Date.now() + Math.floor(Math.random() * 10000);
-        const src = await saveToUploads(file.buffer, file.originalname);
+        const src = await uploadToCloudinary(file.buffer, file.originalname);
         photos.push({ id: photoId, src });
       }
     }
