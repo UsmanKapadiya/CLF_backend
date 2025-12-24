@@ -33,6 +33,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
+const videoRoutes = require('./routes/videoRoutes');
 
 
 // Use routes
@@ -40,6 +41,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/videos', videoRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
