@@ -1,3 +1,100 @@
+// PUT /api/gallery/:id - update gallery
+exports.updateGallery = async (req, res) => {
+  try {
+    const galleryId = Number(req.params.id);
+    const { title, year, subTitle } = req.body;
+    let catalogThumbnail = undefined;
+    let photos = undefined;
+
+    // Parse photos field (array of {id})
+    let photosField = req.body.photos;
+    if (typeof photosField === 'string') {
+      try {
+        photosField = JSON.parse(photosField);
+      } catch (e) {
+        photosField = [];
+      }
+    }
+    if (!Array.isArray(photosField)) photosField = [];
+
+    // Map files by fieldname for easy access, and collect all 'photos' files as array
+    const filesMap = {};
+    let photosFiles = [];
+    if (req.files && Array.isArray(req.files)) {
+      req.files.forEach(file => {
+        if (file.fieldname === 'catalogThumbnail') {
+          filesMap['catalogThumbnail'] = file;
+        } else if (file.fieldname === 'photos') {
+          photosFiles.push(file);
+        } else {
+          filesMap[file.fieldname] = file;
+        }
+      });
+    }
+
+    // Handle catalogThumbnail upload (save locally)
+    if (filesMap['catalogThumbnail']) {
+      const thumbFile = filesMap['catalogThumbnail'];
+      catalogThumbnail = await saveToUploads(thumbFile.buffer, thumbFile.originalname);
+    }
+
+    // Handle photos upload (support both id-based and 'photos' array upload)
+    let newPhotos = [];
+    // 1. id-based (Postman/Frontend sends files with fieldname as id)
+    for (const photo of photosField) {
+      let photoId = Date.now() + Math.floor(Math.random() * 10000);
+      let src = '';
+      if (filesMap[photoId.toString()]) {
+        const file = filesMap[photoId.toString()];
+        src = await saveToUploads(file.buffer, file.originalname);
+      }
+      if (src) {
+        newPhotos.push({ id: photoId, src });
+      }
+    }
+    // 2. If files sent as 'photos' array (e.g., from frontend with multiple files under 'photos')
+    if (photosFiles.length > 0) {
+      for (const file of photosFiles) {
+        const photoId = Date.now() + Math.floor(Math.random() * 10000);
+        const src = await saveToUploads(file.buffer, file.originalname);
+        newPhotos.push({ id: photoId, src });
+      }
+    }
+    if (newPhotos.length > 0) {
+      photos = newPhotos;
+    }
+
+    // Build update object
+    const update = {};
+    if (title !== undefined) update.title = title;
+    if (year !== undefined) update.year = year;
+    if (subTitle !== undefined) update.subTitle = subTitle;
+    if (catalogThumbnail !== undefined) update.catalogThumbnail = catalogThumbnail;
+    if (photos !== undefined) update.photos = photos;
+
+    const updated = await Gallery.findOneAndUpdate({ id: galleryId }, update, { new: true });
+    if (updated) {
+      res.status(200).json({
+        success: true,
+        message: 'Gallery updated successfully',
+        data: updated
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Gallery not found',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update gallery',
+      error: err.message,
+      data: null
+    });
+  }
+};
 const Gallery = require('../models/Gallery');
 
 const fs = require('fs');

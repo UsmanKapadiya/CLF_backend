@@ -18,4 +18,7 @@ router.delete('/:id', galleryController.deleteGallery);
 // GET /api/gallery/:id - get a gallery by id
 router.get('/:id', galleryController.getGalleryById);
 
+// PUT /api/gallery/:id - update a gallery by id
+router.put('/:id', upload.any(), galleryController.updateGallery);
+
 module.exports = router;
