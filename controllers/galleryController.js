@@ -133,11 +133,57 @@ exports.getGalleryByYear = async (req, res) => {
   }
 };
 
-exports.getGalleryById = async (id) => {
-  return await Gallery.findOne({ id: Number(id) });
+
+// GET /api/gallery/:id - controller
+exports.getGalleryById = async (req, res) => {
+  try {
+    const gallery = await Gallery.findOne({ id: Number(req.params.id) });
+    if (gallery) {
+      res.status(200).json({
+        success: true,
+        message: 'Gallery fetched successfully',
+        data: gallery
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Gallery not found',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch gallery',
+      error: err.message,
+      data: null
+    });
+  }
 };
 
-exports.deleteGallery = async (id) => {
-  const result = await Gallery.findOneAndDelete({ id: Number(id) });
-  return result !== null;
+// DELETE /api/gallery/:id - controller
+exports.deleteGallery = async (req, res) => {
+  try {
+    const result = await Gallery.findOneAndDelete({ id: Number(req.params.id) });
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: 'Gallery deleted successfully',
+        data: null
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Gallery not found',
+        data: null
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete gallery',
+      error: err.message,
+      data: null
+    });
+  }
 };
