@@ -1,12 +1,11 @@
 // PUT /api/gallery/:id - update gallery
 exports.updateGallery = async (req, res) => {
   try {
-    const galleryId = Number(req.params.id);
     const { title, year, subTitle } = req.body;
     let catalogThumbnail = undefined;
     let photos = undefined;
 
-    // Parse photos field (array of {id})
+    // Parse photos field (array)
     let photosField = req.body.photos;
     if (typeof photosField === 'string') {
       try {
@@ -40,24 +39,11 @@ exports.updateGallery = async (req, res) => {
 
     // Handle photos upload (support both id-based and 'photos' array upload)
     let newPhotos = [];
-    // 1. id-based (Postman/Frontend sends files with fieldname as id)
-    for (const photo of photosField) {
-      let photoId = Date.now() + Math.floor(Math.random() * 10000);
-      let src = '';
-      if (filesMap[photoId.toString()]) {
-        const file = filesMap[photoId.toString()];
-        src = await saveToUploads(file.buffer, file.originalname);
-      }
-      if (src) {
-        newPhotos.push({ id: photoId, src });
-      }
-    }
-    // 2. If files sent as 'photos' array (e.g., from frontend with multiple files under 'photos')
+    // 1. If files sent as 'photos' array (e.g., from frontend with multiple files under 'photos')
     if (photosFiles.length > 0) {
       for (const file of photosFiles) {
-        const photoId = Date.now() + Math.floor(Math.random() * 10000);
         const src = await saveToUploads(file.buffer, file.originalname);
-        newPhotos.push({ id: photoId, src });
+        newPhotos.push({ src });
       }
     }
     if (newPhotos.length > 0) {
@@ -72,7 +58,7 @@ exports.updateGallery = async (req, res) => {
     if (catalogThumbnail !== undefined) update.catalogThumbnail = catalogThumbnail;
     if (photos !== undefined) update.photos = photos;
 
-    const updated = await Gallery.findOneAndUpdate({ id: galleryId }, update, { new: true });
+    const updated = await Gallery.findByIdAndUpdate(req.params.id, update, { new: true });
     if (updated) {
       res.status(200).json({
         success: true,
@@ -122,11 +108,9 @@ exports.createGallery = async (req, res) => {
     console.log('req.body:', req.body);
     console.log('req.files:', req.files);
     const { title, year, subTitle } = req.body;
-    // Always auto-generate gallery id
-    let galleryId = Date.now();
     let catalogThumbnail = '';
     let photos = [];
-    // Parse photos field (array of {id})
+    // Parse photos field (array)
     let photosField = req.body.photos;
     if (typeof photosField === 'string') {
       try {
@@ -152,36 +136,21 @@ exports.createGallery = async (req, res) => {
       });
     }
 
-
     // Handle catalogThumbnail upload (save locally)
     if (filesMap['catalogThumbnail']) {
       const thumbFile = filesMap['catalogThumbnail'];
       catalogThumbnail = await saveToUploads(thumbFile.buffer, thumbFile.originalname);
     }
 
-    // Handle photos upload (support both id-based and 'photos' array upload)
-    // 1. id-based (Postman/Frontend sends files with fieldname as id)
-    for (const photo of photosField) {
-      let photoId = Date.now() + Math.floor(Math.random() * 10000);
-      let src = '';
-      if (filesMap[photoId.toString()]) {
-        const file = filesMap[photoId.toString()];
-        src = await saveToUploads(file.buffer, file.originalname);
-      }
-      if (src) {
-        photos.push({ id: photoId, src });
-      }
-    }
-    // 2. If files sent as 'photos' array (e.g., from frontend with multiple files under 'photos')
+    // Handle photos upload (support only 'photos' array upload)
     if (photosFiles.length > 0) {
       for (const file of photosFiles) {
-        const photoId = Date.now() + Math.floor(Math.random() * 10000);
         const src = await saveToUploads(file.buffer, file.originalname);
-        photos.push({ id: photoId, src });
+        photos.push({ src });
       }
     }
 
-    const gallery = new Gallery({ id: galleryId, title, year, subTitle, catalogThumbnail, photos });
+    const gallery = new Gallery({ title, year, subTitle, catalogThumbnail, photos });
     await gallery.save();
     res.status(201).json({
       success: true,
@@ -207,7 +176,7 @@ exports.getGalleryByYear = async (req, res) => {
       const year = gallery.year || 'unknown';
       if (!grouped[year]) grouped[year] = [];
       grouped[year].push({
-        id: gallery.id,
+        _id: gallery._id,
         title: gallery.title,
         year: gallery.year,
         subTitle: gallery.subTitle,
@@ -234,7 +203,7 @@ exports.getGalleryByYear = async (req, res) => {
 // GET /api/gallery/:id - controller
 exports.getGalleryById = async (req, res) => {
   try {
-    const gallery = await Gallery.findOne({ id: Number(req.params.id) });
+    const gallery = await Gallery.findById(req.params.id);
     if (gallery) {
       res.status(200).json({
         success: true,
@@ -261,7 +230,7 @@ exports.getGalleryById = async (req, res) => {
 // DELETE /api/gallery/:id - controller
 exports.deleteGallery = async (req, res) => {
   try {
-    const result = await Gallery.findOneAndDelete({ id: Number(req.params.id) });
+    const result = await Gallery.findByIdAndDelete(req.params.id);
     if (result) {
       res.status(200).json({
         success: true,
