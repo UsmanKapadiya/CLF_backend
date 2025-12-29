@@ -14,7 +14,7 @@ const aboutSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['style', 'history', 'philosophy', 'techniques', 'other'],
+    enum: ['style', 'biographies'],
     default: 'other'
   },
   description: {

@@ -129,25 +129,37 @@ exports.getAboutById = async (req, res) => {
 // Get all about content
 exports.getAllAbout = async (req, res) => {
   try {
-    const { category, parent_id } = req.query;
+    const { category } = req.query;
     let query = { isActive: true };
 
     if (category) {
       query.category = category;
     }
 
-    if (parent_id !== undefined) {
-      query.parent_id = parent_id === 'null' || parent_id === '' ? null : parent_id;
-    }
-
-    const aboutContent = await About.find(query)
+    // Get all items matching query
+    const allItems = await About.find(query)
       .populate('parent_id', 'name title')
       .sort({ order: 1, createdAt: -1 });
 
+    // Separate parent and child items
+    const parentItems = allItems.filter(item => !item.parent_id);
+    const childItems = allItems.filter(item => item.parent_id);
+
+    // Build parent list with children objects
+    const result = parentItems.map(parent => {
+      const children = childItems
+        .filter(child => child.parent_id && child.parent_id._id.toString() === parent._id.toString())
+        .map(child => child.toObject());
+      return {
+        ...parent.toObject(),
+        children
+      };
+    });
+
     res.status(200).json({
       success: true,
-      count: aboutContent.length,
-      data: aboutContent
+      count: result.length,
+      data: result
     });
   } catch (error) {
     res.status(500).json({
