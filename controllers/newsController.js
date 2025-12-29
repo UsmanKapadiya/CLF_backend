@@ -78,18 +78,30 @@ exports.updateNews = async (req, res) => {
 // Get All News
 exports.getAllNews = async (req, res) => {
     try {
-        const newsList = await News.find({}).sort({ date: -1 }); // Latest news at the top
-        const count = newsList.length;
+        let { page = 1, limit = 10 } = req.query;
+        page = parseInt(page);
+        limit = parseInt(limit);
 
-        // Remove `id` field and use `_id` instead
+        const length = await News.countDocuments();
+        const totalpages = Math.ceil(length / limit);
+        const skip = (page - 1) * limit;
+
+        const newsList = await News.find({})
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+
         const formattedNewsList = newsList.map(news => {
             const { id, ...rest } = news.toObject();
             return rest;
         });
 
-        res.status(200).json({ 
-            success: true, 
-            count, 
+        res.status(200).json({
+            success: true,
+            // count: formattedNewsList.length,
+            length,
+            page,
+            totalpages,
             data: formattedNewsList
         });
     } catch (error) {
@@ -101,7 +113,8 @@ exports.getAllNews = async (req, res) => {
 exports.getNewsById = async (req, res) => {
     try {
         const { id } = req.params;
-        const news = await News.findOne({ id });
+
+        const news = await News.findById(id);
         if (!news) {
             return res.status(404).json({ success: false, message: 'News not found' });
         }
@@ -118,7 +131,7 @@ exports.getNewsById = async (req, res) => {
 exports.deleteNews = async (req, res) => {
     try {
         const { id } = req.params;
-        const news = await News.findOneAndDelete({ id });
+        const news = await News.findByIdAndDelete(id);
         if (!news) {
             return res.status(404).json({ success: false, message: 'News not found' });
         }
