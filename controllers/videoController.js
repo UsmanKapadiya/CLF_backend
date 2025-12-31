@@ -6,9 +6,18 @@ exports.addVideo = async (req, res) => {
     const { title, videoUrl, catalogThumbnail } = req.body;
     const video = new Video({ title, videoUrl, catalogThumbnail });
     await video.save();
-    res.status(201).json(video);
+    res.status(201).json({
+      success: true,
+      message: 'Video created successfully',
+      data: video
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({
+      success: false,
+      message: 'Failed to create video',
+      error: err.message,
+      data: null
+    });
   }
 };
 
@@ -16,9 +25,18 @@ exports.addVideo = async (req, res) => {
 exports.getVideos = async (req, res) => {
   try {
     const videos = await Video.find();
-    res.json(videos);
+    res.status(200).json({
+      success: true,
+      message: 'Videos fetched successfully',
+      data: videos
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch videos',
+      error: err.message,
+      data: null
+    });
   }
 };
 
@@ -26,10 +44,25 @@ exports.getVideos = async (req, res) => {
 exports.getVideoById = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
-    if (!video) return res.status(404).json({ error: 'Video not found' });
-    res.json(video);
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+        data: null
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Video fetched successfully',
+      data: video
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch video',
+      error: err.message,
+      data: null
+    });
   }
 };
 
@@ -42,10 +75,25 @@ exports.updateVideo = async (req, res) => {
       { title, videoUrl, catalogThumbnail },
       { new: true }
     );
-    if (!video) return res.status(404).json({ error: 'Video not found' });
-    res.json(video);
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+        data: null
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Video updated successfully',
+      data: video
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({
+      success: false,
+      message: 'Failed to update video',
+      error: err.message,
+      data: null
+    });
   }
 };
 
@@ -53,9 +101,24 @@ exports.updateVideo = async (req, res) => {
 exports.deleteVideo = async (req, res) => {
   try {
     const video = await Video.findByIdAndDelete(req.params.id);
-    if (!video) return res.status(404).json({ error: 'Video not found' });
-    res.json({ success: true, message: 'Video deleted successfully', data: null });
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found',
+        data: null
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Video deleted successfully',
+      data: null
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete video',
+      error: err.message,
+      data: null
+    });
   }
 };
