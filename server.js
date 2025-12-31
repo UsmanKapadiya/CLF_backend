@@ -35,6 +35,7 @@ const newsRoutes = require('./routes/newsRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 
 // Use routes
@@ -44,6 +45,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
