@@ -1,0 +1,23 @@
+# .htaccess for Node.js/Express app (Phusion Passenger)
+# Allow access to all
+<IfModule mod_authz_core.c>
+  Require all granted
+</IfModule>
+
+# Redirect all requests to server.js (if using Passenger)
+PassengerAppRoot "${HOME}/e/Intelli Project/CLF_backend"
+PassengerStartupFile server.js
+PassengerEnabled on
+PassengerAppType node
+
+# If you want to serve static files from /public, uncomment below:
+# Alias /public "/e/Intelli Project/CLF_backend/public"
+# <Directory "/e/Intelli Project/CLF_backend/public">
+#   Require all granted
+# </Directory>
+
+# Fallback for 404s
+ErrorDocument 404 /404.html
+
+# Prevent directory listing
+Options -Indexes
